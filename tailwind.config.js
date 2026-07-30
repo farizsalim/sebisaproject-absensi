@@ -1,0 +1,23 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+    './src/app/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'cyan': {
+          500: '#1FB8D4',
+          600: '#1BA5C4',
+          700: '#1892B4',
+        },
+        'logo': {
+          'blue': '#1FB8D4',
+          'magenta': '#D946EF',
+        },
+      },
+    },
+  },
+}
