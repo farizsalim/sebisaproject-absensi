@@ -1,0 +1,395 @@
+================================================================================
+DOKUMENTASI SISTEM PRESENSI SEBISA - LARAVEL
+================================================================================
+Project: presensi-sebisa (Laravel)
+Last Updated: 2026-07-30
+
+================================================================================
+BAGIAN 1: DAFTAR HALAMAN (PAGES)
+================================================================================
+
+🔐 HALAMAN AUTHENTICATION
+├── Login (/login)
+│   └── Route: /login | View: auth/login.blade.php
+├── Register (/register)
+│   └── Route: /register | View: auth/register.blade.php
+├── Forgot Password (/forgot-password)
+│   └── Route: /forgot-password | View: auth/forgot-password.blade.php
+├── Reset Password (/reset-password/{token})
+│   └── Route: /reset-password/{token} | View: auth/reset-password.blade.php
+├── Verify Email (/email-verification)
+│   └── Route: /email/verify | View: auth/verify-email.blade.php
+└── Confirm Password (/confirm-password)
+    └── Route: /confirm-password | View: auth/confirm-password.blade.php
+
+📊 HALAMAN DASHBOARD
+└── Dashboard (/dashboard)
+    └── Route: GET /dashboard | Controller: DashboardController | View: dashboard.blade.php
+    └── Mode: Dynamic (HR/Employee) berdasarkan role user
+
+👤 HALAMAN PROFIL
+└── Profile (/profile)
+    ├── Edit Profile: GET /profile | View: profile/edit.blade.php
+    ├── Update Profile: PATCH /profile
+    └── Delete Profile: DELETE /profile
+
+🔔 HALAMAN NOTIFIKASI
+└── Notifications (/notifications)
+    ├── Inbox: GET /notifications | View: notifications/index.blade.php
+    └── Mark as Read: POST /notifications/read
+
+================================================================================
+EMPLOYEE SECTION (/employee)
+================================================================================
+
+⏰ HALAMAN ABSENSI/CLOCK
+├── Clock In/Out (/employee/clock)
+│   ├── Route: GET /employee/clock | Controller: ClockController@index
+│   ├── Action: POST /employee/clock | Controller: ClockController@store
+│   └── View: employee/clock/*.blade.php
+├── Face Embeddings: GET /employee/face/embeddings
+
+👤 FACE REGISTRATION
+├── Face Registration (/employee/face-registration)
+│   ├── Route: GET /employee/face-registration | Controller: FaceEnrollmentController@show
+│   ├── Enroll: POST /employee/face-registration/enroll
+│   └── View: employee/face-registration.blade.php
+
+📅 ATTENDANCE HISTORY
+├── History (/employee/attendance-history)
+│   ├── Route: GET /employee/attendance-history | Controller: AttendanceHistoryController@index
+│   └── View: employee/attendance-history/*.blade.php
+
+📋 ABSENCE REQUESTS (Izin/Cuti)
+├── List Requests (/employee/absences)
+│   ├── Route: GET /employee/absences | Controller: EmployeeAbsenceRequestController@index
+│   └── View: employee/absence-requests/*.blade.php
+├── Create Request (/employee/absences/create)
+│   ├── Route: GET /employee/absences/create
+│   ├── Action: POST /employee/absences | Controller: EmployeeAbsenceRequestController@store
+├── View Request (/employee/absences/{id})
+│   └── Route: GET /employee/absences/{absenceRequest}
+
+📝 WORK REPORTS
+├── List Reports (/employee/work-reports)
+│   ├── Route: GET /employee/work-reports | Controller: EmployeeWorkReportController@index
+│   └── View: employee/work-reports/*.blade.php
+├── Create Report (/employee/work-reports/create)
+│   ├── Route: GET /employee/work-reports/create
+│   ├── Action: POST /employee/work-reports | Controller: EmployeeWorkReportController@store
+├── View Report (/employee/work-reports/{id})
+│   └── Route: GET /employee/work-reports/{workReport}
+
+================================================================================
+HR SECTION (/hr)
+================================================================================
+
+👥 EMPLOYEE MANAGEMENT
+├── Employee List (/hr/employees)
+│   ├── Route: GET /hr/employees | Controller: EmployeeController@index
+│   └── View: hr/employees/*.blade.php
+├── Create Employee (/hr/employees/create)
+│   ├── Route: GET /hr/employees/create
+│   ├── Action: POST /hr/employees | Controller: EmployeeController@store
+├── Edit Employee (/hr/employees/{id}/edit)
+│   ├── Route: GET /hr/employees/{employee}/edit
+│   ├── Action: PATCH /hr/employees/{employee} | Controller: EmployeeController@update
+├── View Employee (/hr/employees/{id})
+│   ├── Route: GET /hr/employees/{employee}
+├── Restore Employee (/hr/employees/{id}/restore)
+│   ├── Route: POST /hr/employees/{employee}/restore
+
+📸 FACE REGISTRATION (HR)
+├── Face Management (/hr/employees/{id}/face)
+│   ├── Show: GET /hr/employees/{employee}/face | Controller: FaceRegistrationController@show
+│   ├── Store: POST /hr/employees/{employee}/face | Controller: FaceRegistrationController@store
+│   ├── Enroll: POST /hr/employees/{employee}/face/enroll | Controller: FaceRegistrationController@enroll
+│   ├── Delete: DELETE /hr/employees/{employee}/face | Controller: FaceRegistrationController@destroy
+│   └── View: hr/employees/face/*.blade.php
+
+📅 ATTENDANCE MANAGEMENT
+├── Attendance List (/hr/attendances)
+│   ├── Route: GET /hr/attendances | Controller: HrAttendanceController@index
+│   └── View: hr/attendances/*.blade.php
+├── Create Attendance (/hr/attendances/create)
+│   ├── Route: GET /hr/attendances/create
+├── Manual Entry (/hr/attendances/manual)
+│   ├── Route: POST /hr/attendances/manual | Controller: HrAttendanceController@storeManual
+├── Export (/hr/attendances/export/{format})
+│   ├── Route: GET /hr/attendances/export/{format} | Format: xlsx, pdf
+│   ├── Controller: HrAttendanceController@export
+
+🗓️ PUBLIC HOLIDAYS
+├── Holiday List (/hr/public-holidays)
+│   ├── Route: GET /hr/public-holidays | Controller: PublicHolidayController@index
+│   └── View: hr/public-holidays/*.blade.php
+├── Create Holiday (/hr/public-holidays/create)
+│   ├── Route: GET /hr/public-holidays/create
+│   ├── Action: POST /hr/public-holidays | Controller: PublicHolidayController@store
+├── Edit Holiday (/hr/public-holidays/{id}/edit)
+│   ├── Route: GET /hr/public-holidays/{publicHoliday}/edit
+│   ├── Action: PATCH /hr/public-holidays/{publicHoliday} | Controller: PublicHolidayController@update
+├── Delete Holiday
+│   └── Route: DELETE /hr/public-holidays/{publicHoliday}
+
+📋 ABSENCE REQUESTS (HR - Review)
+├── Request List (/hr/absence-requests)
+│   ├── Route: GET /hr/absence-requests | Controller: HrAbsenceRequestController@index
+│   └── View: hr/absence-requests/*.blade.php
+├── View Request (/hr/absence-requests/{id})
+│   ├── Route: GET /hr/absence-requests/{absenceRequest}
+├── Approve Request
+│   ├── Route: PATCH /hr/absence-requests/{absenceRequest}/approve
+│   ├── Controller: HrAbsenceRequestController@approve
+├── Reject Request
+│   ├── Route: PATCH /hr/absence-requests/{absenceRequest}/reject
+│   ├── Controller: HrAbsenceRequestController@reject
+├── Export
+│   ├── Route: GET /hr/absence-requests/export/{format} | Format: xlsx, pdf
+
+📝 WORK REPORTS (HR - Review)
+├── Report List (/hr/work-reports)
+│   ├── Route: GET /hr/work-reports | Controller: HrWorkReportController@index
+│   └── View: hr/work-reports/*.blade.php
+├── View Report (/hr/work-reports/{id})
+│   ├── Route: GET /hr/work-reports/{workReport}
+├── Assessment Update
+│   ├── Route: PATCH /hr/work-reports/{workReport}/assessment
+│   ├── Controller: HrWorkReportController@updateAssessment
+├── Export
+│   ├── Route: GET /hr/work-reports/export/{format} | Format: xlsx, pdf
+
+📊 ASSESSMENTS
+├── Assessment List (/hr/assessments)
+│   ├── Route: GET /hr/assessments | Controller: HrAssessmentController@index
+│   └── View: hr/assessments/*.blade.php
+├── Employee Assessment (/hr/assessments/{employee})
+│   ├── Route: GET /hr/assessments/{employee} | Controller: HrAssessmentController@show
+├── Finalize Assessment
+│   ├── Route: POST /hr/assessments/{employee}/finalize | Controller: HrAssessmentController@finalize
+├── Export
+│   ├── Route: GET /hr/assessments/export/{format} | Format: xlsx, pdf
+
+📢 ANNOUNCEMENTS
+├── Announcement List (/hr/announcements)
+│   ├── Route: GET /hr/announcements | Controller: AnnouncementController@index
+│   └── View: hr/announcements/*.blade.php
+├── Create Announcement (/hr/announcements/create)
+│   ├── Route: GET /hr/announcements/create
+│   ├── Action: POST /hr/announcements | Controller: AnnouncementController@store
+├── Delete Announcement
+│   └── Route: DELETE /hr/announcements/{announcement}
+
+================================================================================
+LEADER SECTION (/leader)
+================================================================================
+
+👨‍💼 ADMIN MANAGEMENT
+├── Admin List (/leader/admins)
+│   ├── Route: GET /leader/admins | Controller: LeaderAdminController@index
+│   └── View: leader/admins/*.blade.php
+├── Create Admin (/leader/admins)
+│   ├── Route: POST /leader/admins | Controller: LeaderAdminController@store
+├── Edit Admin (/leader/admins/{id})
+│   ├── Route: PATCH /leader/admins/{admin} | Controller: LeaderAdminController@update
+├── Delete Admin
+│   └── Route: DELETE /leader/admins/{admin} | Controller: LeaderAdminController@destroy
+
+================================================================================
+FILE DOWNLOAD
+================================================================================
+
+📥 FILE DOWNLOADS
+├── Absence Proof: GET /files/absence-requests/{absenceRequest}
+│   └── Controller: FileDownloadController@absenceProof
+├── Work Report File: GET /files/work-report-files/{workReportFile}
+│   └── Controller: FileDownloadController@workReportFile
+
+================================================================================
+BAGIAN 2: ROUTE DAN CONTROLLER MAPPING
+================================================================================
+
+CONTROLLER STRUCTURE:
+├── app/Http/Controllers/
+│   ├── Auth/
+│   │   ├── AuthenticatedSessionController.php (Login/Logout)
+│   │   ├── ConfirmablePasswordController.php (Confirm Password)
+│   │   ├── EmailVerificationNotificationController.php
+│   │   ├── EmailVerificationPromptController.php
+│   │   ├── NewPasswordController.php (Reset Password)
+│   │   ├── PasswordController.php (Change Password)
+│   │   ├── PasswordResetLinkController.php (Forgot Password)
+│   │   ├── RegisteredUserController.php (Register)
+│   │   └── VerifyEmailController.php (Email Verification)
+│   │
+│   ├── Controller.php (Base Controller)
+│   ├── DashboardController.php
+│   │   └── Dynamic dashboard berdasarkan role user (HR/Employee)
+│   │
+│   ├── FileDownloadController.php
+│   │   ├── absenceProof() - Download bukti izin
+│   │   └── workReportFile() - Download file laporan kerja
+│   │
+│   ├── NotificationController.php
+│   │   ├── inbox() - Lihat notifikasi
+│   │   └── markAsRead() - Tandai notifikasi sebagai dibaca
+│   │
+│   ├── ProfileController.php
+│   │   ├── edit() - Edit profil user
+│   │   ├── update() - Update profil
+│   │   └── destroy() - Hapus akun
+│   │
+│   ├── Employee/
+│   │   ├── AbsenceRequestController.php
+│   │   │   ├── index() - Daftar izin
+│   │   │   ├── create() - Form buat izin
+│   │   │   ├── store() - Simpan izin
+│   │   │   └── show() - Detail izin
+│   │   │
+│   │   ├── AttendanceHistoryController.php
+│   │   │   └── index() - Riwayat kehadiran
+│   │   │
+│   │   ├── ClockController.php
+│   │   │   ├── index() - Halaman clock in/out
+│   │   │   ├── store() - Proses clock in/out
+│   │   │   └── embeddings() - Get face embeddings
+│   │   │
+│   │   ├── FaceEnrollmentController.php
+│   │   │   ├── show() - Form daftar wajah
+│   │   │   └── enroll() - Proses enroll wajah
+│   │   │
+│   │   └── WorkReportController.php
+│   │       ├── index() - Daftar laporan kerja
+│   │       ├── create() - Form buat laporan
+│   │       ├── store() - Simpan laporan
+│   │       └── show() - Detail laporan
+│   │
+│   ├── HR/
+│   │   ├── AbsenceRequestController.php
+│   │   │   ├── index() - Kelola izin
+│   │   │   ├── show() - Detail izin
+│   │   │   ├── approve() - Setujui izin
+│   │   │   ├── reject() - Tolak izin
+│   │   │   └── export() - Export izin
+│   │   │
+│   │   ├── AnnouncementController.php
+│   │   │   ├── index() - Daftar pengumuman
+│   │   │   ├── create() - Form buat pengumuman
+│   │   │   ├── store() - Simpan pengumuman
+│   │   │   └── destroy() - Hapus pengumuman
+│   │   │
+│   │   ├── AssessmentController.php
+│   │   │   ├── index() - Daftar penilaian
+│   │   │   ├── show() - Detail penilaian pegawai
+│   │   │   ├── finalize() - Finalisasi penilaian
+│   │   │   └── export() - Export penilaian
+│   │   │
+│   │   ├── AttendanceController.php
+│   │   │   ├── index() - Kelola kehadiran
+│   │   │   ├── create() - Form entry manual
+│   │   │   ├── storeManual() - Simpan entry manual
+│   │   │   └── export() - Export kehadiran
+│   │   │
+│   │   ├── EmployeeController.php (Resource Controller)
+│   │   │   ├── index() - Daftar pegawai
+│   │   │   ├── create() - Form buat pegawai
+│   │   │   ├── store() - Simpan pegawai
+│   │   │   ├── show() - Detail pegawai
+│   │   │   ├── edit() - Form edit pegawai
+│   │   │   ├── update() - Update pegawai
+│   │   │   ├── destroy() - Hapus pegawai
+│   │   │   └── restore() - Restore pegawai (soft delete)
+│   │   │
+│   │   ├── FaceRegistrationController.php
+│   │   │   ├── show() - Form registrasi wajah
+│   │   │   ├── store() - Simpan foto wajah
+│   │   │   ├── enroll() - Proses enroll wajah
+│   │   │   └── destroy() - Hapus data wajah
+│   │   │
+│   │   ├── PublicHolidayController.php (Resource Controller)
+│   │   │   ├── index() - Daftar libur nasional
+│   │   │   ├── create() - Form buat libur
+│   │   │   ├── store() - Simpan libur
+│   │   │   ├── edit() - Form edit libur
+│   │   │   ├── update() - Update libur
+│   │   │   └── destroy() - Hapus libur
+│   │   │
+│   │   └── WorkReportController.php
+│   │       ├── index() - Kelola laporan kerja
+│   │       ├── show() - Detail laporan kerja
+│   │       ├── updateAssessment() - Update penilaian laporan
+│   │       └── export() - Export laporan kerja
+│   │
+│   └── Leader/
+│       └── AdminController.php
+│           ├── index() - Kelola admin
+│           ├── store() - Buat admin baru
+│           ├── update() - Update admin
+│           └── destroy() - Hapus admin
+
+================================================================================
+MIDDLEWARE & AUTHENTICATION
+================================================================================
+
+Routes yang require Authentication (middleware 'auth'):
+- /dashboard
+- /profile (edit, update, destroy)
+- /files/* (download files)
+- /notifications/* (notification routes)
+- /employee/* (semua employee routes)
+- /hr/* (semua hr routes - dengan role:hr,leader)
+- /leader/* (semua leader routes - dengan role:leader)
+
+Role-based Access Control:
+├── employee - Hanya karyawan
+├── hr - HR dan Leader
+└── leader - Leader/Direktur
+
+================================================================================
+KEY MODELS & RELATIONSHIPS
+================================================================================
+
+- User (Authentication)
+- Employee (Pegawai)
+- Attendance (Kehadiran)
+- AttendanceLog (Log Clock In/Out)
+- AbsenceRequest (Permintaan Izin/Cuti)
+- WorkReport (Laporan Kerja)
+- WorkReportFile (File Laporan)
+- EmployeeAssessment (Penilaian Pegawai)
+- EmployeeFaceEmbedding (Data Face Recognition)
+- Announcement (Pengumuman)
+- PublicHoliday (Libur Nasional)
+
+================================================================================
+CATATAN PENTING UNTUK INTEGRASI
+================================================================================
+
+1. Authentication menggunakan Fortify (Laravel)
+   - All auth routes di: routes/auth.php
+
+2. Role-based access control menggunakan middleware
+   - Middleware: 'role:employee', 'role:hr,leader', 'role:leader'
+
+3. Export functionality mendukung: XLSX dan PDF
+   - Menggunakan ExportController pattern
+
+4. Face Recognition Integration:
+   - FaceEnrollment (Employee) - Self enrollment
+   - FaceRegistration (HR) - Admin registration
+   - Public face-api folder untuk face detection/recognition
+
+5. File Download Security:
+   - Semua file download melalui FileDownloadController
+   - Support untuk: absence proofs, work report files
+
+6. Notification System:
+   - Mark as read functionality
+   - Inbox view untuk semua notifikasi
+
+7. Soft Delete Support:
+   - Employee controller support restore dari soft deleted records
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

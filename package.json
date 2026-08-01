@@ -10,6 +10,7 @@
     "copy:assets": "node scripts/copy-assets.js"
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "next": "16.2.12",
     "react": "19.2.4",
