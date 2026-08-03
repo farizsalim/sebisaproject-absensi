@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { formatTime } from '@/lib/utils'
 import Link from 'next/link'
 import EmployeeShell from '@/components/employee/EmployeeShell'
 
@@ -106,8 +107,8 @@ export default function DashboardPage() {
     })
   }, [])
   const actionClock = async (action) => { const response = await fetch('/api/employee/clock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) }); const result = await response.json(); if (response.ok) setClock(result.attendance) }
-  const clockIn = clock?.clockInAt ? new Date(clock.clockInAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
-  const clockOut = clock?.clockOutAt ? new Date(clock.clockOutAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
+  const clockIn = clock?.clockInAt ? formatTime(clock.clockInAt) : ''
+  const clockOut = clock?.clockOutAt ? formatTime(clock.clockOutAt) : ''
   const activities = [
     ...(data?.latestAbsences || []).map((item) => ({ title: 'Pengajuan Izin', date: new Date(item.requestDate).toLocaleDateString('id-ID'), status: item.status, tone: 'amber', icon: 'event_note' })),
     ...(data?.latestReports || []).map((item) => ({ title: item.title, date: new Date(item.reportDate).toLocaleDateString('id-ID'), tone: 'slate', icon: 'edit_note' })),

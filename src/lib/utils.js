@@ -22,14 +22,24 @@ export function formatDate(date, format = 'DD MMM YYYY') {
 
 export function formatTime(time) {
   if (!time) return '-'
-  const [hours, minutes] = time.split(':')
-  return `${hours}:${minutes}`
+  if (typeof time === 'string' && /^\d{1,2}:\d{2}/.test(time)) {
+    const [hours, minutes] = time.split(':')
+    return `${hours.padStart(2, '0')}:${minutes}`
+  }
+  return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(time))
+}
+
+export function formatTimeInput(time) {
+  if (!time) return ''
+  const date = new Date(time)
+  if (Number.isNaN(date.getTime())) return ''
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
 export function formatDateTime(datetime) {
   if (!datetime) return '-'
   const date = new Date(datetime)
-  return formatDate(date) + ' ' + formatTime(date.toLocaleTimeString())
+  return formatDate(date) + ' ' + formatTime(date)
 }
 
 export function getInitials(name) {

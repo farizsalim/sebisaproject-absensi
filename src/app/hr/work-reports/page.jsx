@@ -1,3 +1,3 @@
-import { WorkReportsPage } from '@/components/role/RoleListPage'
+import WorkReportsAssessmentPage from '@/components/role/WorkReportsAssessmentPage'
 
-export default WorkReportsPage
+export default WorkReportsAssessmentPage

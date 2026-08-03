@@ -1,3 +1,3 @@
-import { AttendancesPage } from '@/components/role/RoleListPage'
+import AttendancesPage from '@/components/role/AttendancesPage'
 
 export default AttendancesPage
