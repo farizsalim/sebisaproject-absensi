@@ -84,3 +84,7 @@ public/images/          Asset logo
 - Assessment laporan kerja dengan nilai dan catatan HR.
 - CRUD hari libur HR, termasuk edit, catatan, dan hapus.
 - Review izin HR dengan detail alasan dan catatan reviewer.
+- Status presensi otomatis `present`, `late`, `no_checkout`, dan `absent`.
+- Filter attendance HR berdasarkan tanggal, employee, dan status beserta ringkasan.
+
+Aturan batas clock in default adalah `09:00`. Nilai ini dapat diubah melalui environment variable `ATTENDANCE_CLOCK_IN_DEADLINE`.

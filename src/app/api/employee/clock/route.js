@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { attendanceStatus } from '@/lib/attendance'
 
 function unauthorized() {
   return NextResponse.json({ message: 'Unauthenticated.' }, { status: 401 })
@@ -53,8 +54,8 @@ export async function POST(request) {
   }
 
   const attendance = action === 'clock_out'
-    ? await prisma.attendance.update({ where: { id: existing.id }, data: { clockOutAt: now, status: existing.status === 'absent' ? 'present' : existing.status } })
-    : await prisma.attendance.upsert({ where: { employeeId_attendanceDate: { employeeId: employee.id, attendanceDate } }, update: { clockInAt: now, status: 'present', source: 'web' }, create: { employeeId: employee.id, attendanceDate, clockInAt: now, status: 'present', source: 'web', createdBy: user.id } })
+    ? await prisma.attendance.update({ where: { id: existing.id }, data: { clockOutAt: now, status: attendanceStatus({ clockInAt: existing.clockInAt, clockOutAt: now }) } })
+    : await prisma.attendance.upsert({ where: { employeeId_attendanceDate: { employeeId: employee.id, attendanceDate } }, update: { clockInAt: now, status: attendanceStatus({ clockInAt: now, clockOutAt: null }), source: 'web' }, create: { employeeId: employee.id, attendanceDate, clockInAt: now, status: attendanceStatus({ clockInAt: now, clockOutAt: null }), source: 'web', createdBy: user.id } })
 
   return NextResponse.json(jsonSafe({ message: action === 'clock_out' ? 'Clock out berhasil.' : 'Clock in berhasil.', attendance }))
 }

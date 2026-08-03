@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { attendanceStatus } from '@/lib/attendance'
 import { canManage, forbidden, safe, unauthorized } from '../../_utils'
 
 export async function GET(request, { params }) {
@@ -28,7 +29,8 @@ export async function PATCH(request, { params }) {
     const attendance = await prisma.$transaction(async (tx) => {
       const existing = await tx.attendance.findUnique({ where: { id: BigInt(id) } })
       if (!existing) throw new Error('ATTENDANCE_NOT_FOUND')
-      const updated = await tx.attendance.update({ where: { id: BigInt(id) }, data: { attendanceDate, clockInAt, clockOutAt, status: clockInAt ? 'present' : 'absent', source: 'manual' } })
+      const status = attendanceStatus({ clockInAt, clockOutAt })
+      const updated = await tx.attendance.update({ where: { id: BigInt(id) }, data: { attendanceDate, clockInAt, clockOutAt, status, source: 'manual' } })
       await tx.attendanceLog.create({ data: { attendanceId: updated.id, changedBy: user.id, fieldChanged: 'manual_update', oldValue: JSON.stringify({ attendanceDate: existing.attendanceDate, clockInAt: existing.clockInAt, clockOutAt: existing.clockOutAt, status: existing.status }), newValue: JSON.stringify({ attendanceDate, clockInAt, clockOutAt, status: updated.status }), reason: String(body.reason || '').trim() || 'Perubahan presensi manual oleh HR' } })
       return updated
     })

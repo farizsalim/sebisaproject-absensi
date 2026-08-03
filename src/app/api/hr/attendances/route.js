@@ -1,9 +1,24 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { attendanceStatus } from '@/lib/attendance'
 import { canManage, forbidden, safe, unauthorized } from '../_utils'
 
-export async function GET(request) { const user = await getCurrentUser(); if (!user) return unauthorized(); if (!canManage(user)) return forbidden(); const { searchParams } = new URL(request.url); const date = searchParams.get('date'); const attendances = await prisma.attendance.findMany({ where: date ? { attendanceDate: new Date(date) } : {}, include: { employee: true }, orderBy: { attendanceDate: 'desc' }, take: 500 }); return NextResponse.json(safe({ attendances })) }
+export async function GET(request) {
+	const user = await getCurrentUser(); if (!user) return unauthorized(); if (!canManage(user)) return forbidden()
+	const { searchParams } = new URL(request.url)
+	const date = searchParams.get('date')
+	const status = searchParams.get('status')?.trim()
+	const query = searchParams.get('q')?.trim()
+	const where = {
+		...(date ? { attendanceDate: new Date(date) } : {}),
+		...(status ? { status } : {}),
+		...(query ? { employee: { OR: [{ fullName: { contains: query } }, { employeeNumber: { contains: query } }, { division: { contains: query } }] } } : {}),
+	}
+	const attendances = await prisma.attendance.findMany({ where, include: { employee: true }, orderBy: [{ attendanceDate: 'desc' }, { employee: { fullName: 'asc' } }], take: 500 })
+	const summary = attendances.reduce((result, attendance) => { result[attendance.status] = (result[attendance.status] || 0) + 1; return result }, {})
+	return NextResponse.json(safe({ attendances, summary }))
+}
 
 export async function POST(request) {
 	const user = await getCurrentUser(); if (!user) return unauthorized(); if (!canManage(user)) return forbidden()
@@ -19,7 +34,8 @@ export async function POST(request) {
 			const employee = await tx.employee.findUnique({ where: { id: employeeId, deletedAt: null } })
 			if (!employee) throw new Error('EMPLOYEE_NOT_FOUND')
 			const existing = await tx.attendance.findUnique({ where: { employeeId_attendanceDate: { employeeId, attendanceDate } } })
-			const result = await tx.attendance.upsert({ where: { employeeId_attendanceDate: { employeeId, attendanceDate } }, update: { clockInAt, clockOutAt, status: clockInAt ? 'present' : 'absent', source: 'manual', createdBy: user.id }, create: { employeeId, attendanceDate, clockInAt, clockOutAt, status: clockInAt ? 'present' : 'absent', source: 'manual', createdBy: user.id } })
+			const status = attendanceStatus({ clockInAt, clockOutAt })
+			const result = await tx.attendance.upsert({ where: { employeeId_attendanceDate: { employeeId, attendanceDate } }, update: { clockInAt, clockOutAt, status, source: 'manual', createdBy: user.id }, create: { employeeId, attendanceDate, clockInAt, clockOutAt, status, source: 'manual', createdBy: user.id } })
 			await tx.attendanceLog.create({ data: { attendanceId: result.id, changedBy: user.id, fieldChanged: existing ? 'manual_update' : 'manual_create', oldValue: existing ? JSON.stringify({ clockInAt: existing.clockInAt, clockOutAt: existing.clockOutAt, status: existing.status }) : null, newValue: JSON.stringify({ clockInAt, clockOutAt, status: result.status }), reason: body.reason ? String(body.reason) : 'Presensi manual oleh HR' } })
 			return result
 		})
