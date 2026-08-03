@@ -8,6 +8,10 @@ export const ATTENDANCE_STATUS = {
   PRESENT: 'present',
   ABSENT: 'absent',
   LATE: 'late',
+  SICK: 'sick',
+  ABSENCE: 'absence',
+  HOLIDAY: 'holiday',
+  NO_CHECKOUT: 'no_checkout',
   EARLY_LEAVE: 'early_leave',
 }
 

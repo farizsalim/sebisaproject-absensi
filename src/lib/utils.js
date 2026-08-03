@@ -83,6 +83,10 @@ export function getStatusColor(status) {
     present: 'bg-green-100 text-green-800',
     absent: 'bg-red-100 text-red-800',
     late: 'bg-yellow-100 text-yellow-800',
+    no_checkout: 'bg-orange-100 text-orange-800',
+    sick: 'bg-sky-100 text-sky-800',
+    absence: 'bg-slate-100 text-slate-800',
+    holiday: 'bg-indigo-100 text-indigo-800',
     draft: 'bg-slate-100 text-slate-800',
     submitted: 'bg-blue-100 text-blue-800',
   }
@@ -97,6 +101,10 @@ export function getStatusLabel(status) {
     present: 'Hadir',
     absent: 'Absen',
     late: 'Terlambat',
+    no_checkout: 'Belum checkout',
+    sick: 'Sakit',
+    absence: 'Izin',
+    holiday: 'Libur',
     draft: 'Draf',
     submitted: 'Dikirim',
   }

@@ -86,5 +86,8 @@ public/images/          Asset logo
 - Review izin HR dengan detail alasan dan catatan reviewer.
 - Status presensi otomatis `present`, `late`, `no_checkout`, dan `absent`.
 - Filter attendance HR berdasarkan tanggal, employee, dan status beserta ringkasan.
+- Assessment attendance menghitung hari kerja Senin-Jumat, mengecualikan public holiday, menghitung izin approved, dan menyimpan skor attendance.
+
+Status Laravel yang sudah direpresentasikan di konstanta aplikasi: `present`, `late`, `sick`, `absence`, `holiday`, `absent`, `no_checkout`, dan `early_leave`. `early_leave` serta deadline berbasis shift belum dapat dihitung karena schema aktif belum memiliki jadwal/shift employee.
 
 Aturan batas clock in default adalah `09:00`. Nilai ini dapat diubah melalui environment variable `ATTENDANCE_CLOCK_IN_DEADLINE`.
