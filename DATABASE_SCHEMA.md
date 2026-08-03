@@ -132,6 +132,27 @@ Status Values:
 - 'absent'       : Tidak hadir (alpa)
 - 'no_checkout'  : Belum checkout (belum clock out)
 
+================================================================================
+3A. TABEL: shifts
+================================================================================
+
+Tujuan: Menyimpan jadwal kerja employee untuk menentukan batas clock in dan clock out.
+
+Kolom:
+┌─ id (PK)                    : unsignedBigInteger
+├─ employee_id (FK, INDEX)    : unsignedBigInteger - Employee pemilik shift
+├─ name                       : varchar(100) - Nama shift
+├─ clock_in_deadline          : time - Batas waktu clock in
+├─ clock_out_deadline         : time - Batas waktu clock out normal
+├─ effective_from             : date - Mulai berlaku
+├─ effective_to               : date nullable - Akhir berlaku
+├─ work_days                  : varchar(20) - Hari kerja, default 1,2,3,4,5
+├─ is_active                  : boolean - Status shift
+├─ created_at                 : timestamp
+└─ updated_at                 : timestamp
+
+Catatan: work_days menggunakan ISO weekday: 1 Senin sampai 7 Minggu.
+
 Relationships:
 - belongsTo: Employee (soft delete included)
 - belongsTo: User (creator)

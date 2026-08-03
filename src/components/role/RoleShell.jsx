@@ -8,6 +8,7 @@ const hrLinks = [
   ['dashboard', 'Ringkasan', '/console'],
   ['groups', 'Employee', '/hr/employees'],
   ['event_available', 'Presensi', '/hr/attendances'],
+  ['schedule', 'Jadwal Shift', '/hr/shifts'],
   ['rule', 'Pengajuan Izin', '/hr/absence-requests'],
   ['description', 'Laporan Kerja', '/hr/work-reports'],
   ['campaign', 'Pengumuman', '/hr/announcements'],

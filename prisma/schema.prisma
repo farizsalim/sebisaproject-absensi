@@ -54,6 +54,7 @@ model Employee {
   workReports     WorkReport[]
   faceEmbeddings  EmployeeFaceEmbedding[]
   assessments     EmployeeAssessment[]
+  shifts           Shift[]
 
   @@index([division])
   @@index([position])
@@ -86,6 +87,26 @@ model Attendance {
   @@index([employeeId, attendanceDate])
   @@index([status])
   @@map("attendances")
+}
+
+model Shift {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId       BigInt    @map("employee_id") @db.UnsignedBigInt
+  name             String    @db.VarChar(100)
+  clockInDeadline  DateTime  @map("clock_in_deadline") @db.Time(0)
+  clockOutDeadline DateTime  @map("clock_out_deadline") @db.Time(0)
+  effectiveFrom    DateTime  @map("effective_from") @db.Date
+  effectiveTo      DateTime? @map("effective_to") @db.Date
+  workDays         String    @default("1,2,3,4,5") @map("work_days") @db.VarChar(20)
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, effectiveFrom, effectiveTo])
+  @@index([isActive])
+  @@map("shifts")
 }
 
 model AttendanceLog {
