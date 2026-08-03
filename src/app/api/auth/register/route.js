@@ -1,6 +1,6 @@
-import { randomBytes, scryptSync } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { hashPassword } from '@/lib/password'
 
 function validationResponse(errors) {
   return NextResponse.json(
@@ -10,12 +10,6 @@ function validationResponse(errors) {
     },
     { status: 422 },
   )
-}
-
-function hashPassword(password) {
-  const salt = randomBytes(16).toString('hex')
-  const hash = scryptSync(password, salt, 64).toString('hex')
-  return `${salt}:${hash}`
 }
 
 export async function POST(request) {
