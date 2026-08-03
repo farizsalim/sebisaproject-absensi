@@ -20,6 +20,13 @@ export function formatDate(date, format = 'DD MMM YYYY') {
     .replace('YYYY', year)
 }
 
+export function formatDateOnly(date) {
+  if (!date) return '-'
+  const value = new Date(date)
+  if (Number.isNaN(value.getTime())) return '-'
+  return value.toLocaleDateString('id-ID', { timeZone: 'UTC' })
+}
+
 export function formatTime(time) {
   if (!time) return '-'
   if (typeof time === 'string' && /^\d{1,2}:\d{2}/.test(time)) {

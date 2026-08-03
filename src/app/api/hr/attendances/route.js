@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { attendanceStatus } from '@/lib/attendance'
+import { dateOnly } from '@/lib/date'
 import { canManage, forbidden, safe, unauthorized } from '../_utils'
 
 export async function GET(request) {
@@ -11,7 +12,7 @@ export async function GET(request) {
 	const status = searchParams.get('status')?.trim()
 	const query = searchParams.get('q')?.trim()
 	const where = {
-		...(date ? { attendanceDate: new Date(date) } : {}),
+		...(date ? { attendanceDate: dateOnly(date) } : {}),
 		...(status ? { status } : {}),
 		...(query ? { employee: { OR: [{ fullName: { contains: query } }, { employeeNumber: { contains: query } }, { division: { contains: query } }] } } : {}),
 	}
@@ -24,7 +25,7 @@ export async function POST(request) {
 	const user = await getCurrentUser(); if (!user) return unauthorized(); if (!canManage(user)) return forbidden()
 	const body = await request.json().catch(() => ({}))
 	const employeeId = body.employeeId ? BigInt(body.employeeId) : null
-	const attendanceDate = new Date(`${body.attendanceDate}T00:00:00`)
+	const attendanceDate = dateOnly(body.attendanceDate)
 	const clockInAt = body.clockInAt ? new Date(`${body.attendanceDate}T${body.clockInAt}:00`) : null
 	const clockOutAt = body.clockOutAt ? new Date(`${body.attendanceDate}T${body.clockOutAt}:00`) : null
 	if (!employeeId || Number.isNaN(attendanceDate.getTime()) || (body.clockInAt && Number.isNaN(clockInAt.getTime())) || (body.clockOutAt && Number.isNaN(clockOutAt.getTime()))) return NextResponse.json({ message: 'Employee, tanggal, dan jam presensi harus valid.' }, { status: 422 })

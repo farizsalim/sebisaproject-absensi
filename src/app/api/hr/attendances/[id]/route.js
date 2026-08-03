@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { attendanceStatus } from '@/lib/attendance'
+import { dateOnly } from '@/lib/date'
 import { canManage, forbidden, safe, unauthorized } from '../../_utils'
 
 export async function GET(request, { params }) {
@@ -20,7 +21,7 @@ export async function PATCH(request, { params }) {
   const user = await getCurrentUser(); if (!user) return unauthorized(); if (!canManage(user)) return forbidden()
   const { id } = await params
   const body = await request.json().catch(() => ({}))
-  const attendanceDate = new Date(`${body.attendanceDate}T00:00:00`)
+  const attendanceDate = dateOnly(body.attendanceDate)
   const clockInAt = body.clockInAt ? new Date(`${body.attendanceDate}T${body.clockInAt}:00`) : null
   const clockOutAt = body.clockOutAt ? new Date(`${body.attendanceDate}T${body.clockOutAt}:00`) : null
   if (Number.isNaN(attendanceDate.getTime()) || (clockInAt && Number.isNaN(clockInAt.getTime())) || (clockOutAt && Number.isNaN(clockOutAt.getTime()))) return NextResponse.json({ message: 'Tanggal atau jam presensi tidak valid.' }, { status: 422 })

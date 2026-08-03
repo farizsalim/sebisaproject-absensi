@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { dateKeyInAppTimeZone, dateOnly, dateOnlyRange } from '@/lib/date'
 
 function unauthorized() {
   return NextResponse.json({ message: 'Unauthenticated.' }, { status: 401 })
@@ -26,9 +27,10 @@ export async function GET() {
   }
 
   const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayKey = dateKeyInAppTimeZone(now)
+  const today = dateOnly(todayKey)
+  const [year, month] = todayKey.split('-').map(Number)
+  const { start: startOfMonth, end: endOfMonth } = dateOnlyRange(year, month)
   const [todayAttendance, monthlyAttendance, latestAbsences, latestReports, upcomingHolidays, recentAnnouncements] = await Promise.all([
     prisma.attendance.findUnique({ where: { employeeId_attendanceDate: { employeeId: employee.id, attendanceDate: today } } }),
     prisma.attendance.findMany({ where: { employeeId: employee.id, attendanceDate: { gte: startOfMonth, lte: endOfMonth } }, orderBy: { attendanceDate: 'desc' } }),

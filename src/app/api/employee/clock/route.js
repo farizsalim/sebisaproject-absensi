@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { attendanceStatus } from '@/lib/attendance'
+import { dateKeyInAppTimeZone, dateOnly } from '@/lib/date'
 
 function unauthorized() {
   return NextResponse.json({ message: 'Unauthenticated.' }, { status: 401 })
 }
 
 function today() {
-  const now = new Date()
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  return dateOnly(dateKeyInAppTimeZone())
 }
 
 function jsonSafe(value) {

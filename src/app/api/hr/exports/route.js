@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { canManage, forbidden, unauthorized } from '../_utils'
+import { dateOnly } from '@/lib/date'
 
 function csvValue(value) {
   const text = value === null || value === undefined ? '' : String(value)
@@ -29,7 +30,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type')
   const date = searchParams.get('date')
-  const where = date ? { ...(type === 'attendances' ? { attendanceDate: new Date(date) } : type === 'absence-requests' ? { requestDate: new Date(date) } : { reportDate: new Date(date) }) } : {}
+  const where = date ? { ...(type === 'attendances' ? { attendanceDate: dateOnly(date) } : type === 'absence-requests' ? { requestDate: dateOnly(date) } : { reportDate: dateOnly(date) }) } : {}
 
   if (type === 'attendances') {
     const items = await prisma.attendance.findMany({ where, include: { employee: true }, orderBy: [{ attendanceDate: 'desc' }, { employee: { fullName: 'asc' } }] })
