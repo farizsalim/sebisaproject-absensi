@@ -26,9 +26,9 @@ function Sidebar({ onLogout }) {
   return (
     <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[280px] flex-col border-r border-slate-200 bg-white shadow-sm md:flex">
       <Link href="/dashboard" className="mb-2 flex items-center gap-3 px-6 py-6">
-        <img src="/images/logo.png" alt="Sebisa Presensi" className="h-20 w-20 shrink-0 object-contain" />
+        <img src="/images/logo.png" alt="Sebisa Project Absensi" className="h-20 w-20 shrink-0 object-contain" />
         <div>
-          <h1 className="text-base font-bold leading-tight text-slate-900">Sebisa Presensi</h1>
+          <h1 className="text-base font-bold leading-tight text-slate-900">Sebisa Project Absensi</h1>
           <p className="text-xs font-medium text-slate-500">Employee Portal</p>
         </div>
       </Link>

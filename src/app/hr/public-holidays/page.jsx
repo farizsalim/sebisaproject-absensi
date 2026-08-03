@@ -1,3 +1,3 @@
-import { HolidaysPage } from '@/components/role/RoleListPage'
+import HolidaysManagementPage from '@/components/role/HolidaysManagementPage'
 
-export default HolidaysPage
+export default HolidaysManagementPage

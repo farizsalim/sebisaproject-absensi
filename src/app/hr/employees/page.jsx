@@ -1,3 +1,3 @@
-import { EmployeesPage } from '@/components/role/RoleListPage'
+import EmployeesManagementPage from '@/components/role/EmployeesManagementPage'
 
-export default EmployeesPage
+export default EmployeesManagementPage

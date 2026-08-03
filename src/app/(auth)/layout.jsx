@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Authentication - Sebisa Presensi',
-  description: 'Login dan register untuk Sebisa Presensi',
+  title: 'Sebisa Project Absensi',
+  description: 'Login dan register untuk Sebisa Project Absensi',
 }
 
 export default function AuthLayout({ children }) {

@@ -69,9 +69,18 @@ public/images/          Asset logo
 ## Status Belum Lengkap
 
 - Email verification dan email forgot/reset password.
-- UI detail/edit employee dan edit/hapus hari libur.
+- UI detail employee dan edit/hapus hari libur.
 - Upload bukti izin dan lampiran laporan.
-- Export Excel/PDF.
-- Assessment kinerja.
-- GPS, kamera face recognition, presensi manual, dan audit log.
-- Middleware redirect berdasarkan login dan role.
+- Export Excel/PDF; export operasional saat ini tersedia dalam CSV.
+- Assessment kinerja lanjutan seperti histori per periode dan finalisasi terpisah.
+- GPS dan kamera face recognition.
+- Middleware redirect server-side dan automated tests.
+
+## Status Selesai
+
+- Presensi manual HR.
+- Edit dan audit perubahan presensi.
+- Export CSV presensi, pengajuan izin, dan laporan kerja.
+- Assessment laporan kerja dengan nilai dan catatan HR.
+- CRUD hari libur HR, termasuk edit, catatan, dan hapus.
+- Review izin HR dengan detail alasan dan catatan reviewer.

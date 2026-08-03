@@ -4,6 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-cyan: #42d9df;
+  --brand-blue: #1475d1;
+  --brand-magenta: #c52ca8;
+  --brand-orange: #f28b28;
+  --brand-yellow: #ffc52c;
+  --brand-ink: #10213f;
+}
+
+@layer components {
+  .field {
+    @apply min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500;
+    border-color: color-mix(in srgb, var(--brand-blue) 28%, #cbd5e1);
+  }
+
+  .field:focus {
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-cyan) 24%, transparent);
+  }
+
+  textarea.field {
+    @apply min-h-24 resize-y;
+  }
+}
+
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -11,8 +36,33 @@
   --color-logo-magenta: #D946EF;
 }
 
+@layer utilities {
+  .bg-emerald-600 {
+    background-color: var(--brand-blue);
+  }
+
+  .hover\:bg-emerald-700:hover {
+    background-color: #0f5cae;
+  }
+
+  .text-emerald-600,
+  .text-emerald-700,
+  .text-emerald-800 {
+    color: var(--brand-blue);
+  }
+
+  .bg-emerald-50 {
+    background-color: #e9fcfd;
+  }
+
+  .bg-emerald-100 {
+    background-color: #d5f7f8;
+  }
+}
+
 body {
   @apply antialiased;
+  color: var(--brand-ink);
 }
 
 .material-symbols-outlined {

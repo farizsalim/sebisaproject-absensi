@@ -32,7 +32,8 @@ export async function PATCH(request, { params }) {
     const report = await prisma.workReport.findUnique({ where: { id: BigInt(id) } })
     if (!report) return NextResponse.json({ message: 'Laporan kerja tidak ditemukan.' }, { status: 404 })
     const period = periodFor(report.reportDate)
-    const assessment = await prisma.employeeAssessment.upsert({ where: { employeeId_periodStart_periodEnd: { employeeId: report.employeeId, periodStart: period.start, periodEnd: period.end } }, update: { projectScore: score, finalScore: score, notes: String(body.review_note || '').trim() || null, finalizedBy: user.id, finalizedAt: new Date(), status: 'finalized' }, create: { employeeId: report.employeeId, periodStart: period.start, periodEnd: period.end, projectScore: score, finalScore: score, notes: String(body.review_note || '').trim() || null, finalizedBy: user.id, finalizedAt: new Date(), status: 'finalized' } })
+    const reviewNote = String(body.review_note || '').trim() || null
+    const assessment = await prisma.employeeAssessment.upsert({ where: { employeeId_periodStart_periodEnd: { employeeId: report.employeeId, periodStart: period.start, periodEnd: period.end } }, update: { projectScore: score, finalScore: score, notes: reviewNote, finalizedBy: user.id, finalizedAt: new Date(), status: 'finalized' }, create: { employeeId: report.employeeId, periodStart: period.start, periodEnd: period.end, projectScore: score, finalScore: score, notes: reviewNote, finalizedBy: user.id, finalizedAt: new Date(), status: 'finalized' } })
     return NextResponse.json(safe({ message: 'Assessment laporan berhasil disimpan.', assessment }))
   } catch {
     return NextResponse.json({ message: 'Assessment laporan gagal disimpan.' }, { status: 500 })

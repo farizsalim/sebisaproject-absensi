@@ -24,6 +24,11 @@ export async function POST(request) {
     )
   }
 
+  const registrationCode = typeof body.registration_code === 'string' ? body.registration_code : ''
+  if (!process.env.REGISTER_CODE || registrationCode !== process.env.REGISTER_CODE) {
+    return NextResponse.json({ message: 'Link registrasi tidak valid.' }, { status: 404 })
+  }
+
   const name = typeof body.name === 'string' ? body.name.trim() : ''
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : ''
   const password = typeof body.password === 'string' ? body.password : ''

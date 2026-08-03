@@ -1,3 +1,3 @@
-import { AbsenceRequestsPage } from '@/components/role/RoleListPage'
+import AbsenceRequestsManagementPage from '@/components/role/AbsenceRequestsManagementPage'
 
-export default AbsenceRequestsPage
+export default AbsenceRequestsManagementPage
