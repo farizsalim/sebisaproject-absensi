@@ -30,7 +30,11 @@ export default function Login() {
       if (res.ok) {
         setSuccess('Login berhasil! Mengalihkan...')
         setTimeout(() => {
-          window.location.href = '/dashboard'
+          const role = data.user?.role?.toLowerCase()
+          const destination = ['hr', 'leader'].includes(role)
+            ? '/console'
+              : '/dashboard'
+          window.location.href = destination
         }, 1000)
       } else {
         setError(data.message || 'Email atau password salah')

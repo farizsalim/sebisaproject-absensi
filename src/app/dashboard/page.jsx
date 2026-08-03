@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import EmployeeShell from '@/components/employee/EmployeeShell'
 
 const menuGroups = [
   {
@@ -14,22 +15,6 @@ const menuGroups = [
       ['edit_note', 'Laporan Kerja', '/employee/work-reports'],
     ],
   },
-]
-
-const holidays = [
-  { name: 'Hari Kemerdekaan Republik Indonesia', date: '17 Agu 2026', relative: '14 hari lagi' },
-  { name: 'Maulid Nabi Muhammad SAW', date: '25 Agu 2026', relative: '22 hari lagi' },
-]
-
-const announcements = [
-  { title: 'Pembaharuan Sistem Presensi', message: 'Sistem presensi wajah akan mendapatkan pembaruan fitur minggu ini.', time: '2 jam lalu' },
-  { title: 'Jadwal Meeting Bulanan', message: 'Meeting bulanan perusahaan akan dilaksanakan pada Jumat pagi.', time: 'Kemarin' },
-]
-
-const activities = [
-  { title: 'Pengajuan Izin', date: '28 Jul 2026', status: 'Menunggu', tone: 'amber', icon: 'schedule' },
-  { title: 'Submit Daily Report', date: '27 Jul 2026 - "Progress project absensi"', tone: 'slate' },
-  { title: 'Clock In & Out Hari Ini', date: '03 Agu 2026', detail: '08:02 - ... WIB', tone: 'amber' },
 ]
 
 function Icon({ children, size = 20 }) {
@@ -71,7 +56,7 @@ function Sidebar({ onLogout }) {
   )
 }
 
-function Topbar({ notificationOpen, setNotificationOpen, profileOpen, setProfileOpen }) {
+function Topbar({ notificationOpen, setNotificationOpen, profileOpen, setProfileOpen, user, unreadCount }) {
   return (
     <header className="fixed right-0 top-0 z-40 hidden h-16 w-[calc(100%-280px)] items-center justify-between border-b border-slate-200 bg-slate-50/80 px-8 backdrop-blur-md md:flex">
       <div className="flex-1" />
@@ -79,21 +64,21 @@ function Topbar({ notificationOpen, setNotificationOpen, profileOpen, setProfile
         <div className="relative">
           <button onClick={() => setNotificationOpen(!notificationOpen)} aria-label="Notifikasi" className="relative p-1 text-slate-500 transition hover:text-slate-900">
             <Icon size={22}>notifications</Icon>
-            <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">2</span>
+            {unreadCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{unreadCount}</span>}
           </button>
           {notificationOpen && <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
             <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3"><h3 className="text-sm font-semibold text-slate-900">Notifikasi</h3><button className="text-xs font-semibold text-emerald-600">Tandai dibaca</button></div>
-            <div className="divide-y divide-slate-100"><div className="flex gap-3 bg-emerald-50 px-4 py-3"><Icon size={20}>campaign</Icon><div><p className="text-sm font-semibold text-slate-900">Pengumuman baru</p><p className="text-xs text-slate-500">Ada pengumuman terbaru untuk Anda.</p></div></div><div className="flex gap-3 px-4 py-3"><Icon size={20}>check_circle</Icon><div><p className="text-sm font-semibold text-slate-900">Presensi tersimpan</p><p className="text-xs text-slate-500">Clock in hari ini berhasil.</p></div></div></div>
+            <div className="px-4 py-4 text-sm text-slate-500">Buka halaman notifikasi untuk melihat semua pesan.</div>
             <div className="border-t border-slate-200 px-4 py-2.5 text-center"><Link href="/notifications" className="text-xs font-semibold text-emerald-600">Lihat Semua Notifikasi</Link></div>
           </div>}
         </div>
         <div className="h-8 w-px bg-slate-200" />
         <div className="relative">
           <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-3">
-            <div className="hidden text-right lg:block"><p className="text-sm font-semibold text-slate-900">Fariz Salim</p><p className="text-xs text-slate-500">Employee</p></div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-bold text-slate-700">FS</span><Icon size={18}>expand_more</Icon>
+            <div className="hidden text-right lg:block"><p className="text-sm font-semibold text-slate-900">{user?.name || 'Memuat...'}</p><p className="text-xs capitalize text-slate-500">{user?.role || ''}</p></div>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-bold text-slate-700">{user?.name?.slice(0, 2).toUpperCase() || '--'}</span><Icon size={18}>expand_more</Icon>
           </button>
-          {profileOpen && <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white py-2 shadow-lg"><div className="border-b border-slate-100 px-4 py-3"><p className="text-sm font-semibold text-slate-900">Fariz Salim</p><p className="text-xs text-slate-500">fariz@sebisa.com</p><span className="mt-2 inline-flex rounded-md bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">Employee</span></div><Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-100"><Icon size={18}>person</Icon>Profil & Password</Link><button className="flex w-full items-center gap-3 border-t border-slate-100 px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-red-50 hover:text-red-600"><Icon size={18}>logout</Icon>Keluar</button></div>}
+          {profileOpen && <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white py-2 shadow-lg"><div className="border-b border-slate-100 px-4 py-3"><p className="text-sm font-semibold text-slate-900">{user?.name}</p><p className="text-xs text-slate-500">{user?.email}</p><span className="mt-2 inline-flex rounded-md bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold capitalize text-emerald-800">{user?.role}</span></div><Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-100"><Icon size={18}>person</Icon>Profil & Password</Link></div>}
         </div>
       </div>
     </header>
@@ -110,34 +95,36 @@ function ClockCard({ type, time, active, onAction }) {
 }
 
 export default function DashboardPage() {
-  const [notificationOpen, setNotificationOpen] = useState(false)
-  const [profileOpen, setProfileOpen] = useState(false)
-  const [clockIn, setClockIn] = useState('')
-  const [clockOut, setClockOut] = useState('')
+  const [data, setData] = useState(null)
+  const [clock, setClock] = useState(null)
   const today = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' }).format(new Date())
 
-  const actionClockIn = () => setClockIn(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }))
-  const actionClockOut = () => setClockOut(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }))
+  useEffect(() => {
+    fetch('/api/auth/me').then((response) => response.json()).then((auth) => {
+      if (['hr', 'leader'].includes(auth.user?.role?.toLowerCase())) return window.location.replace('/console')
+      return Promise.all([fetch('/api/dashboard').then((response) => response.json()), fetch('/api/employee/clock').then((response) => response.json())]).then(([dashboard, attendance]) => { setData(dashboard); setClock(attendance.attendance) })
+    })
+  }, [])
+  const actionClock = async (action) => { const response = await fetch('/api/employee/clock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) }); const result = await response.json(); if (response.ok) setClock(result.attendance) }
+  const clockIn = clock?.clockInAt ? new Date(clock.clockInAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
+  const clockOut = clock?.clockOutAt ? new Date(clock.clockOutAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
+  const activities = [
+    ...(data?.latestAbsences || []).map((item) => ({ title: 'Pengajuan Izin', date: new Date(item.requestDate).toLocaleDateString('id-ID'), status: item.status, tone: 'amber', icon: 'event_note' })),
+    ...(data?.latestReports || []).map((item) => ({ title: item.title, date: new Date(item.reportDate).toLocaleDateString('id-ID'), tone: 'slate', icon: 'edit_note' })),
+  ].slice(0, 4)
 
-  return <div className="font-dashboard min-h-screen bg-[#f7f9fb] text-slate-900">
-    <Sidebar onLogout={() => { window.location.href = '/login' }} />
-    <Topbar {...{ notificationOpen, setNotificationOpen, profileOpen, setProfileOpen }} />
-    <main className="min-h-screen pb-24 pt-8 md:ml-[280px] md:pb-8 md:pt-24">
-      <div className="mx-auto max-w-[1440px] px-6 md:px-8">
-        <section className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center"><div><h2 className="text-xl font-semibold text-slate-950 md:text-2xl">Halo, Fariz Salim!</h2><p className="text-base text-slate-500">IT / Full Stack Developer / Batch 2020</p></div><div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium shadow-sm"><Icon size={20}>calendar_today</Icon>{today}</div></section>
-        <section className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2"><ClockCard type="in" time={clockIn} active={!clockIn} onAction={actionClockIn} /><ClockCard type="out" time={clockOut} active={Boolean(clockIn) && !clockOut} onAction={actionClockOut} /></section>
+  return <EmployeeShell>
+        <section className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center"><div><h2 className="text-xl font-semibold text-slate-950 md:text-2xl">Halo, {data?.user?.name || '...' }!</h2><p className="text-base capitalize text-slate-500">{data?.employee ? `${data.employee.division} / ${data.employee.position}${data.employee.batch ? ` / Batch ${data.employee.batch}` : ''}` : 'Memuat profil...'}</p></div><div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium shadow-sm"><Icon size={20}>calendar_today</Icon>{today}</div></section>
+        <section className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2"><ClockCard type="in" time={clockIn} active={!clockIn} onAction={() => actionClock('clock_in')} /><ClockCard type="out" time={clockOut} active={Boolean(clockIn) && !clockOut} onAction={() => actionClock('clock_out')} /></section>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h3 className="mb-4 text-lg font-semibold text-slate-950">Statistik Bulan Ini</h3><div className="grid grid-cols-2 gap-4 sm:grid-cols-4"><Stat label="Hadir" value="18" /><Stat label="Terlambat" value="2" tone="amber" /><Stat label="Izin/Sakit" value="1" tone="sky" /><Stat label="Alpha" value="0" tone="red" /></div></section>
+            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h3 className="mb-4 text-lg font-semibold text-slate-950">Statistik Bulan Ini</h3><div className="grid grid-cols-2 gap-4 sm:grid-cols-4"><Stat label="Hadir" value={data?.monthlyStatus?.present || 0} /><Stat label="Terlambat" value={data?.monthlyStatus?.late || 0} tone="amber" /><Stat label="Izin/Sakit" value={(data?.monthlyStatus?.permission || 0) + (data?.monthlyStatus?.sick || 0)} tone="sky" /><Stat label="Alpha" value={data?.monthlyStatus?.absent || 0} tone="red" /></div></section>
             <section><h3 className="mb-4 text-lg font-semibold text-slate-950">Aksi Cepat</h3><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{[['photo_camera', 'Presensi', '/employee/clock'], ['face_retouching_natural', 'Daftar Wajah', '/employee/face-registration'], ['edit_document', 'Report Harian', '/employee/work-reports/create'], ['event_note', 'Ajukan Izin', '/employee/absences/create']].map(([icon, label, href]) => <Link key={label} href={href} className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-emerald-500 hover:bg-emerald-50"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-hover:bg-white group-hover:text-emerald-600"><Icon>{icon}</Icon></span><span className="text-sm font-medium text-slate-900">{label}</span></Link>)}</div></section>
           </div>
           <section className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-6 flex items-center justify-between"><h3 className="text-lg font-semibold text-slate-950">Aktivitas Terakhir</h3><Link href="/employee/attendance-history" className="text-sm font-medium text-sky-500 hover:underline">Lihat Semua</Link></div><div className="relative flex-1"><div className="absolute bottom-2 left-4 top-2 w-px bg-slate-200" /><div className="space-y-6">{activities.map((item) => <div key={item.title} className="relative flex gap-4"><div className={`absolute left-4 top-1 h-2 w-2 -translate-x-1/2 rounded-full ring-4 ring-white ${item.tone === 'amber' ? 'bg-amber-500' : 'bg-slate-400'}`} /><div className="ml-8 flex-1"><p className="text-sm font-medium text-slate-950">{item.title}</p><p className="mt-0.5 text-xs text-slate-500">{item.date}</p>{item.status && <span className="mt-2 inline-flex items-center gap-1.5 rounded bg-amber-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-700"><Icon size={12}>{item.icon}</Icon>{item.status}</span>}{item.detail && <p className="mt-1 text-xs text-slate-600">{item.detail}</p>}</div></div>)}</div></div></section>
         </div>
-        <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2"><InfoList title="Hari Libur Mendatang" icon="event" iconTone="emerald" items={holidays} /><InfoList title="Pengumuman" icon="campaign" iconTone="violet" items={announcements} /></section>
-      </div>
-    </main>
-    <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-slate-200 bg-white px-2 py-2 md:hidden"><Link href="/dashboard" className="flex flex-col items-center gap-1 px-3 py-1 text-emerald-700"><Icon size={21}>dashboard</Icon><span className="text-[10px] font-semibold">Dashboard</span></Link><Link href="/employee/clock" className="flex flex-col items-center gap-1 px-3 py-1 text-slate-500"><Icon size={21}>schedule</Icon><span className="text-[10px] font-semibold">Presensi</span></Link><Link href="/employee/attendance-history" className="flex flex-col items-center gap-1 px-3 py-1 text-slate-500"><Icon size={21}>history</Icon><span className="text-[10px] font-semibold">Riwayat</span></Link><Link href="/profile" className="flex flex-col items-center gap-1 px-3 py-1 text-slate-500"><Icon size={21}>person</Icon><span className="text-[10px] font-semibold">Profil</span></Link></nav>
-  </div>
+        <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2"><InfoList title="Hari Libur Mendatang" icon="event" iconTone="emerald" items={(data?.upcomingHolidays || []).map((item) => ({ name: item.name, date: new Date(item.holidayDate).toLocaleDateString('id-ID') }))} /><InfoList title="Pengumuman" icon="campaign" iconTone="violet" items={(data?.recentAnnouncements || []).map((item) => ({ title: item.title, message: item.message, time: new Date(item.createdAt).toLocaleDateString('id-ID') }))} /></section>
+  </EmployeeShell>
 }
 
 function Stat({ label, value, tone = 'slate' }) {

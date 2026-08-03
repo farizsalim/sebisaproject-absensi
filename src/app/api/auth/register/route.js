@@ -47,24 +47,27 @@ export async function POST(request) {
   }
 
   try {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashPassword(password),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: { name, email, password: hashPassword(password) },
+        select: { id: true, name: true, email: true, role: true },
+      })
+      await tx.employee.create({
+        data: {
+          userId: createdUser.id,
+          employeeNumber: `EMP-${createdUser.id}`,
+          fullName: name,
+          division: typeof body.company === 'string' && body.company.trim() ? body.company.trim() : 'General',
+          position: 'Employee',
+        },
+      })
+      return createdUser
     })
 
     return NextResponse.json(
       {
         message: 'Registrasi berhasil.',
-        user,
+        user: { ...user, id: user.id.toString() },
       },
       { status: 201 },
     )

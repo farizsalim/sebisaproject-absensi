@@ -1,0 +1,11 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import EmployeeShell from '@/components/employee/EmployeeShell'
+
+export default function CreateAbsencePage() {
+  const router = useRouter(); const [form, setForm] = useState({ requestType: 'izin', requestDate: '', reason: '' }); const [error, setError] = useState('')
+  const submit = async (event) => { event.preventDefault(); const response = await fetch('/api/employee/absences', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) }); const data = await response.json(); if (!response.ok) return setError(data.message); router.push('/employee/absences') }
+  return <EmployeeShell><header className="mb-8"><h1 className="text-2xl font-semibold">Ajukan Izin</h1><p className="mt-1 text-sm text-slate-500">Isi detail pengajuan Anda.</p></header><form onSubmit={submit} className="max-w-2xl space-y-5 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">{error && <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}<label className="block text-sm font-medium">Jenis izin<select value={form.requestType} onChange={(e) => setForm({ ...form, requestType: e.target.value })} className="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5"><option value="izin">Izin</option><option value="cuti">Cuti</option><option value="sakit">Sakit</option></select></label><label className="block text-sm font-medium">Tanggal<input required type="date" value={form.requestDate} onChange={(e) => setForm({ ...form, requestDate: e.target.value })} className="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5" /></label><label className="block text-sm font-medium">Alasan<textarea required rows="5" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5" /></label><button className="rounded-lg bg-emerald-600 px-5 py-2.5 font-semibold text-white">Kirim Pengajuan</button></form></EmployeeShell>
+}
