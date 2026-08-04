@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sebisa Project Absensi
 
-## Getting Started
+Website absensi dan administrasi employee berbasis Next.js, Prisma, dan MariaDB. Aplikasi memiliki portal employee serta console operasional untuk HR dan leader.
 
-First, run the development server:
+## Fitur Utama
+
+### Portal Employee
+
+- Login, registrasi, logout, dan session berbasis cookie HttpOnly.
+- Dashboard employee dengan ringkasan presensi, izin, laporan, hari libur, dan pengumuman.
+- Clock in dan clock out harian.
+- Riwayat presensi berdasarkan periode.
+- Status presensi otomatis: hadir, terlambat, belum checkout, dan tidak hadir.
+- Pengajuan izin, cuti, dan sakit.
+- Riwayat status pengajuan izin.
+- Pembuatan dan pengelolaan laporan kerja.
+- Rencana fitur Face ID untuk pendaftaran descriptor dan pengenalan wajah employee.
+- Pengelolaan profil dan perubahan password.
+- Inbox notifikasi.
+
+### Console HR
+
+- Dashboard operasional HR.
+- Daftar employee aktif.
+- Tambah dan nonaktifkan employee.
+- Monitoring presensi employee.
+- Input presensi manual.
+- Edit presensi dan audit perubahan.
+- Filter presensi berdasarkan tanggal, employee, dan status.
+- Ringkasan jumlah hadir, terlambat, belum checkout, dan tidak hadir.
+- Export data presensi, pengajuan izin, dan laporan kerja dalam CSV.
+- Review, approve, dan reject pengajuan izin.
+- Catatan HR pada pengajuan izin.
+- Review laporan kerja dan pemberian nilai assessment.
+- Pengelolaan pengumuman.
+- CRUD hari libur perusahaan.
+- Pengelolaan jadwal shift employee.
+- Pengaturan jam clock in/out, periode berlaku, hari kerja, dan status aktif shift.
+
+### Console Leader
+
+- Semua fitur operasional HR.
+- Manajemen akun HR.
+- Perubahan role employee menjadi HR atau pengembalian role menjadi employee.
+
+## Aturan Presensi
+
+- Batas clock in default adalah `09:00`.
+- Batas tersebut dapat diubah melalui environment variable `ATTENDANCE_CLOCK_IN_DEADLINE`.
+- Clock out hanya dapat dilakukan setelah clock in.
+- Clock out tidak boleh lebih awal dari clock in.
+- Satu employee hanya dapat memiliki satu presensi per tanggal.
+- Tanggal presensi menggunakan timezone aplikasi `Asia/Jakarta` secara default.
+- Hari kerja assessment dihitung Senin sampai Jumat dan public holiday dikecualikan.
+- Assessment menghitung jumlah hadir, terlambat, sakit, izin, belum checkout, alpha, serta skor attendance.
+
+## Route Utama
+
+| Area | Route |
+| --- | --- |
+| Login | `/login` |
+| Employee dashboard | `/dashboard` |
+| Presensi employee | `/employee/clock` |
+| Riwayat presensi | `/employee/attendance-history` |
+| Pengajuan izin | `/employee/absences` |
+| Laporan kerja | `/employee/work-reports` |
+| Pendaftaran wajah | `/employee/face-registration` |
+| HR console | `/console` |
+| Employee management | `/hr/employees` |
+| Monitoring presensi | `/hr/attendances` |
+| Jadwal shift | `/hr/shifts` |
+| Review izin | `/hr/absence-requests` |
+| Review laporan | `/hr/work-reports` |
+| Pengumuman | `/hr/announcements` |
+| Hari libur | `/hr/public-holidays` |
+| Manajemen akun HR | `/leader/admins` |
+
+## Teknologi
+
+- Next.js App Router
+- React dan JavaScript/JSX
+- Prisma Client
+- MariaDB/MySQL
+- Tailwind CSS
+- Material Symbols
+- HMAC-signed HttpOnly session cookie
+
+## Menjalankan Project
+
+Install dependency:
+
+```bash
+npm install
+```
+
+Siapkan environment variable, minimal:
+
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/sebisa"
+SESSION_SECRET="ganti-dengan-secret-yang-kuat"
+```
+
+Generate Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+Jalankan development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
+Buka [http://localhost:3001](http://localhost:3001).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Struktur Project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+src/
+  app/                 Halaman dan API Route Handlers Next.js
+  components/         Shell, dashboard, form, dan halaman berbasis role
+  lib/                 Auth, Prisma, password, tanggal, attendance, dan utilitas
+  services/            Service API lama yang masih dipertahankan
+prisma/
+  schema.prisma        Model database MariaDB
+public/images/         Logo dan asset aplikasi
+```
 
-## Learn More
+## Catatan Pengembangan
 
-To learn more about Next.js, take a look at the following resources:
+Fitur yang masih dalam pengembangan atau belum tersedia penuh:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Verifikasi email dan forgot/reset password berbasis email.
+- Face ID, termasuk pendaftaran descriptor dan face recognition kamera secara langsung.
+- Upload bukti izin dan lampiran laporan.
+- Export Excel/PDF.
+- Histori assessment per periode dan finalisasi assessment terpisah.
+- Middleware redirect server-side dan automated tests.
