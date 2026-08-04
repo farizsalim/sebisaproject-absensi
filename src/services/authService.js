@@ -88,7 +88,7 @@ export class AuthService {
   }
 
   static async getCurrentUser() {
-    const response = await fetch(`${API_BASE_URL}/user`, {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: {
         'Content-Type': 'application/json',
       },

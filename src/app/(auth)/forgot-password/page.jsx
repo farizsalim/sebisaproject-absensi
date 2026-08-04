@@ -53,7 +53,7 @@ export default function ForgotPassword() {
           {/* Header Section */}
           <div className="flex flex-col items-center space-y-2 md:space-y-4">
             <div className="mb-1">
-              <img src="/images/logo.png" alt="Sebisa Presensi" className="h-20 md:h-32 object-contain" />
+              <img src="/images/logo.png" alt="Sebisa Project Absensi" className="h-20 md:h-32 object-contain" />
             </div>
             <div className="space-y-1 md:space-y-2 text-center">
               <h1 className="text-xl md:text-3xl font-bold text-slate-900">Reset Password</h1>
@@ -185,7 +185,7 @@ export default function ForgotPassword() {
         {/* Help Text */}
         <div className="mt-6 text-center">
           <p className="text-xs md:text-sm text-slate-300">
-            Sistem Manajemen Presensi Sebisa
+            Sistem Manajemen Absensi Sebisa Project
           </p>
         </div>
       </div>

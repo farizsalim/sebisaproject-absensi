@@ -1,6 +1,6 @@
-import { randomBytes, scryptSync } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { hashPassword } from '@/lib/password'
 
 function validationResponse(errors) {
   return NextResponse.json(
@@ -10,12 +10,6 @@ function validationResponse(errors) {
     },
     { status: 422 },
   )
-}
-
-function hashPassword(password) {
-  const salt = randomBytes(16).toString('hex')
-  const hash = scryptSync(password, salt, 64).toString('hex')
-  return `${salt}:${hash}`
 }
 
 export async function POST(request) {
@@ -28,6 +22,11 @@ export async function POST(request) {
       { message: 'Format request tidak valid.' },
       { status: 400 },
     )
+  }
+
+  const registrationCode = typeof body.registration_code === 'string' ? body.registration_code : ''
+  if (!process.env.REGISTER_CODE || registrationCode !== process.env.REGISTER_CODE) {
+    return NextResponse.json({ message: 'Link registrasi tidak valid.' }, { status: 404 })
   }
 
   const name = typeof body.name === 'string' ? body.name.trim() : ''
@@ -53,24 +52,27 @@ export async function POST(request) {
   }
 
   try {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashPassword(password),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: { name, email, password: hashPassword(password) },
+        select: { id: true, name: true, email: true, role: true },
+      })
+      await tx.employee.create({
+        data: {
+          userId: createdUser.id,
+          employeeNumber: `EMP-${createdUser.id}`,
+          fullName: name,
+          division: typeof body.company === 'string' && body.company.trim() ? body.company.trim() : 'General',
+          position: 'Employee',
+        },
+      })
+      return createdUser
     })
 
     return NextResponse.json(
       {
         message: 'Registrasi berhasil.',
-        user,
+        user: { ...user, id: user.id.toString() },
       },
       { status: 201 },
     )

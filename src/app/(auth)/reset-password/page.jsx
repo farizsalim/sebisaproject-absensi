@@ -84,7 +84,7 @@ function ResetPasswordForm() {
         <div className="relative z-10 w-full max-w-md">
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-slate-200/50 p-5 md:p-8 space-y-5 md:space-y-6">
             <div className="flex flex-col items-center space-y-2 md:space-y-4">
-              <img src="/images/logo.png" alt="Sebisa Presensi" className="h-20 md:h-32 object-contain" />
+              <img src="/images/logo.png" alt="Sebisa Project Absensi" className="h-20 md:h-32 object-contain" />
               <h1 className="text-xl md:text-3xl font-bold text-slate-900">Link Tidak Valid</h1>
             </div>
 
@@ -125,7 +125,7 @@ function ResetPasswordForm() {
           {/* Header Section */}
           <div className="flex flex-col items-center space-y-2 md:space-y-4">
             <div className="mb-1">
-              <img src="/images/logo.png" alt="Sebisa Presensi" className="h-20 md:h-32 object-contain" />
+              <img src="/images/logo.png" alt="Sebisa Project Absensi" className="h-20 md:h-32 object-contain" />
             </div>
             <div className="space-y-1 md:space-y-2 text-center">
               <h1 className="text-xl md:text-3xl font-bold text-slate-900">Buat Password Baru</h1>
@@ -287,7 +287,7 @@ function ResetPasswordForm() {
         {/* Help Text */}
         <div className="mt-6 text-center">
           <p className="text-xs md:text-sm text-slate-300">
-            Sistem Manajemen Presensi Sebisa
+            Sistem Manajemen Absensi Sebisa Project
           </p>
         </div>
       </div>

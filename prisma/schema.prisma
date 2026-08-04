@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,13 +8,265 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("employee")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name            String    @db.VarChar(255)
+  email           String    @unique @db.VarChar(255)
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  password        String    @db.VarChar(255)
+  rememberToken   String?   @map("remember_token") @db.VarChar(100)
+  role            String    @default("employee") @db.VarChar(255)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  employee              Employee?
+  attendancesCreated    Attendance[]         @relation("AttendanceCreatedBy")
+  attendanceLogsChanged AttendanceLog[]
+  reviewedAbsences      AbsenceRequest[]     @relation("AbsenceReviewedBy")
+  reviewedReports       WorkReport[]         @relation("ReportReviewedBy")
+  finalizedAssessments  EmployeeAssessment[] @relation("AssessmentFinalizedBy")
+  createdHolidays       PublicHoliday[]      @relation("HolidayCreatedBy")
+  announcements         Announcement[]       @relation("AnnouncementCreatedBy")
 
   @@map("users")
+}
+
+model Employee {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId           BigInt    @unique @map("user_id") @db.UnsignedBigInt
+  employeeNumber   String    @unique @map("employee_number") @db.VarChar(255)
+  fullName         String    @map("full_name") @db.VarChar(255)
+  division         String    @db.VarChar(255)
+  position         String    @db.VarChar(255)
+  batch            String?   @db.VarChar(255)
+  phone            String?   @db.VarChar(255)
+  onboardingDate   DateTime? @map("onboarding_date") @db.Date
+  offboardingDate  DateTime? @map("offboarding_date") @db.Date
+  faceDescriptor   Json?     @map("face_descriptor")
+  faceRegisteredAt DateTime? @map("face_registered_at")
+  notes            String?   @db.Text
+  deletedAt        DateTime? @map("deleted_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendances     Attendance[]
+  absenceRequests AbsenceRequest[]
+  workReports     WorkReport[]
+  faceEmbeddings  EmployeeFaceEmbedding[]
+  assessments     EmployeeAssessment[]
+  shifts           Shift[]
+
+  @@index([division])
+  @@index([position])
+  @@index([offboardingDate])
+  @@map("employees")
+}
+
+model Attendance {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId        BigInt    @map("employee_id") @db.UnsignedBigInt
+  attendanceDate    DateTime  @map("attendance_date") @db.Date
+  clockInAt         DateTime? @map("clock_in_at")
+  clockOutAt        DateTime? @map("clock_out_at")
+  status            String    @default("absent") @db.VarChar(255)
+  source            String    @default("face") @db.VarChar(255)
+  clockInIp         String?   @map("clock_in_ip") @db.VarChar(45)
+  clockOutIp        String?   @map("clock_out_ip") @db.VarChar(45)
+  clockInUserAgent  String?   @map("clock_in_user_agent") @db.Text
+  clockOutUserAgent String?   @map("clock_out_user_agent") @db.Text
+  hrNotes           String?   @map("hr_notes") @db.Text
+  createdBy         BigInt?   @map("created_by") @db.UnsignedBigInt
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  employee Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  creator  User?           @relation("AttendanceCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  logs     AttendanceLog[]
+
+  @@unique([employeeId, attendanceDate])
+  @@index([employeeId, attendanceDate])
+  @@index([status])
+  @@map("attendances")
+}
+
+model Shift {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId       BigInt    @map("employee_id") @db.UnsignedBigInt
+  name             String    @db.VarChar(100)
+  clockInDeadline  DateTime  @map("clock_in_deadline") @db.Time(0)
+  clockOutDeadline DateTime  @map("clock_out_deadline") @db.Time(0)
+  effectiveFrom    DateTime  @map("effective_from") @db.Date
+  effectiveTo      DateTime? @map("effective_to") @db.Date
+  workDays         String    @default("1,2,3,4,5") @map("work_days") @db.VarChar(20)
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, effectiveFrom, effectiveTo])
+  @@index([isActive])
+  @@map("shifts")
+}
+
+model AttendanceLog {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  attendanceId BigInt   @map("attendance_id") @db.UnsignedBigInt
+  changedBy    BigInt?  @map("changed_by") @db.UnsignedBigInt
+  fieldChanged String   @map("field_changed") @db.VarChar(50)
+  oldValue     String?  @map("old_value") @db.Text
+  newValue     String?  @map("new_value") @db.Text
+  reason       String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  attendance    Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  changedByUser User?      @relation(fields: [changedBy], references: [id], onDelete: SetNull)
+
+  @@index([attendanceId, fieldChanged])
+  @@map("attendance_logs")
+}
+
+model AbsenceRequest {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId    BigInt    @map("employee_id") @db.UnsignedBigInt
+  requestType   String    @map("request_type") @db.VarChar(255)
+  requestDate   DateTime  @map("request_date") @db.Date
+  reason        String    @db.Text
+  proofFilePath String?   @map("proof_file_path") @db.VarChar(255)
+  proofFileName String?   @map("proof_file_name") @db.VarChar(255)
+  status        String    @default("pending") @db.VarChar(255)
+  reviewedBy    BigInt?   @map("reviewed_by") @db.UnsignedBigInt
+  reviewedAt    DateTime? @map("reviewed_at")
+  hrNote        String?   @map("hr_note") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  reviewer User?    @relation("AbsenceReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@index([employeeId, requestDate, status])
+  @@map("absence_requests")
+}
+
+model WorkReport {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId  BigInt   @map("employee_id") @db.UnsignedBigInt
+  reportDate  DateTime @map("report_date") @db.Date
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  workStartAt DateTime @map("work_start_at") @db.Time(0)
+  workEndAt   DateTime @map("work_end_at") @db.Time(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  employee     Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  files        WorkReportFile[]
+  reviewedBy   User?            @relation("ReportReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById BigInt?          @map("reviewed_by") @db.UnsignedBigInt
+
+  @@index([employeeId, reportDate])
+  @@map("work_reports")
+}
+
+model WorkReportFile {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  workReportId BigInt   @map("work_report_id") @db.UnsignedBigInt
+  filePath     String   @map("file_path") @db.VarChar(255)
+  fileName     String   @map("file_name") @db.VarChar(255)
+  fileType     String   @map("file_type") @db.VarChar(50)
+  fileSize     Int      @map("file_size") @db.UnsignedInt
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  workReport WorkReport @relation(fields: [workReportId], references: [id], onDelete: Cascade)
+
+  @@map("work_report_files")
+}
+
+model EmployeeFaceEmbedding {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId BigInt   @map("employee_id") @db.UnsignedBigInt
+  embedding  String   @db.LongText
+  labelPose  String   @default("front") @map("label_pose") @db.VarChar(20)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, labelPose])
+  @@index([employeeId, labelPose])
+  @@map("employee_face_embeddings")
+}
+
+model PublicHoliday {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  holidayDate DateTime @unique @map("holiday_date") @db.Date
+  name        String   @db.VarChar(255)
+  notes       String?  @db.Text
+  createdBy   BigInt?  @map("created_by") @db.UnsignedBigInt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  creator User? @relation("HolidayCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([holidayDate])
+  @@map("public_holidays")
+}
+
+model EmployeeAssessment {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  employeeId        BigInt    @map("employee_id") @db.UnsignedBigInt
+  periodStart       DateTime  @map("period_start") @db.Date
+  periodEnd         DateTime  @map("period_end") @db.Date
+  effectiveWorkDays Int       @default(0) @map("effective_work_days") @db.UnsignedInt
+  presentCount      Int       @default(0) @map("present_count") @db.UnsignedInt
+  lateCount         Int       @default(0) @map("late_count") @db.UnsignedInt
+  sickCount         Int       @default(0) @map("sick_count") @db.UnsignedInt
+  absenceCount      Int       @default(0) @map("absence_count") @db.UnsignedInt
+  noCheckoutCount   Int       @default(0) @map("no_checkout_count") @db.UnsignedInt
+  absentCount       Int       @default(0) @map("absent_count") @db.UnsignedInt
+  attendanceScore   Decimal   @default(0) @map("attendance_score") @db.Decimal(5, 2)
+  projectScore      Decimal   @default(0) @map("project_score") @db.Decimal(5, 2)
+  finalScore        Decimal   @default(0) @map("final_score") @db.Decimal(5, 2)
+  status            String    @default("draft") @db.VarChar(255)
+  finalizedBy       BigInt?   @map("finalized_by") @db.UnsignedBigInt
+  finalizedAt       DateTime? @map("finalized_at")
+  notes             String?   @db.Text
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  finalizer User?    @relation("AssessmentFinalizedBy", fields: [finalizedBy], references: [id], onDelete: SetNull)
+
+  @@unique([employeeId, periodStart, periodEnd])
+  @@index([status])
+  @@map("employee_assessments")
+}
+
+model Announcement {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  title     String   @db.VarChar(255)
+  message   String   @db.Text
+  createdBy BigInt   @map("created_by") @db.UnsignedBigInt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  creator User @relation("AnnouncementCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("announcements")
+}
+
+model Notification {
+  id             String    @id @db.VarChar(36)
+  type           String    @db.VarChar(255)
+  notifiableType String    @map("notifiable_type") @db.VarChar(255)
+  notifiableId   BigInt    @map("notifiable_id") @db.UnsignedBigInt
+  data           String    @db.Text
+  readAt         DateTime? @map("read_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@index([notifiableType, notifiableId])
+  @@map("notifications")
 }

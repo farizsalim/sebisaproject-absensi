@@ -12,12 +12,38 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata = {
-  title: 'Sebisa Presensi - Sistem Manajemen Kehadiran',
-  description: 'Sistem manajemen presensi dan kehadiran karyawan Sebisa',
-  viewport: 'width=device-width, initial-scale=1',
+  title: 'Sebisa Project Absensi',
+  description: 'Sistem manajemen presensi dan kehadiran karyawan Sebisa Project',
+  applicationName: 'Sebisa Project Absensi',
+  keywords: ['absensi karyawan', 'presensi karyawan', 'manajemen kehadiran', 'Sebisa Project'],
+  authors: [{ name: 'Sebisa Project' }],
+  creator: 'Sebisa Project',
+  publisher: 'Sebisa Project',
+  category: 'business',
+  robots: { index: true, follow: true },
   icons: {
     icon: '/favicon.ico',
+    apple: '/favicon.ico',
   },
+  openGraph: {
+    title: 'Sebisa Project Absensi',
+    description: 'Sistem manajemen presensi dan kehadiran karyawan Sebisa Project',
+    type: 'website',
+    locale: 'id_ID',
+    siteName: 'Sebisa Project Absensi',
+    images: [{ url: '/images/logo.png', width: 512, height: 512, alt: 'Logo Sebisa Project Absensi' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Sebisa Project Absensi',
+    description: 'Sistem manajemen presensi dan kehadiran karyawan Sebisa Project',
+    images: ['/images/logo.png'],
+  },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }) {
@@ -26,7 +52,7 @@ export default function RootLayout({ children }) {
       lang="id"
       className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
     >
-      <body className="antialiased">{children}</body>
+      <body suppressHydrationWarning className="antialiased">{children}</body>
     </html>
   )
 }

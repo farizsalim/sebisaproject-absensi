@@ -2,8 +2,11 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function Register() {
+  const pathname = usePathname()
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,6 +20,12 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  React.useEffect(() => {
+    if (pathname === '/register') router.replace('/login')
+  }, [pathname, router])
+
+  const registrationCode = pathname.split('/').filter(Boolean).at(-1) || ''
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -58,6 +67,7 @@ export default function Register() {
           password: formData.password,
           password_confirmation: formData.password_confirmation,
           company: formData.company,
+          registration_code: registrationCode,
         }),
       })
 
@@ -93,11 +103,11 @@ export default function Register() {
           {/* Header Section */}
           <div className="flex flex-col items-center space-y-2 md:space-y-4">
             <div className="mb-1">
-              <img src="/images/logo.png" alt="Sebisa Presensi" className="h-20 md:h-32 object-contain" />
+              <img src="/images/logo.png" alt="Sebisa Project Absensi" className="h-20 md:h-32 object-contain" />
             </div>
             <div className="space-y-1 md:space-y-2 text-center">
               <h1 className="text-xl md:text-3xl font-bold text-slate-900">Daftar Akun</h1>
-              <p className="text-slate-500 text-xs md:text-base">Buat akun baru untuk menggunakan Sebisa Presensi</p>
+              <p className="text-slate-500 text-xs md:text-base">Buat akun baru untuk menggunakan Sebisa Project Absensi</p>
             </div>
           </div>
 
@@ -342,7 +352,7 @@ export default function Register() {
         {/* Help Text */}
         <div className="mt-6 text-center">
           <p className="text-xs md:text-sm text-slate-300">
-            Sistem Manajemen Presensi Sebisa
+            Sistem Manajemen Absensi Sebisa Project
           </p>
         </div>
       </div>
